@@ -1,0 +1,162 @@
+/* ===== GLOBAL STYLES ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+
+body {
+  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: var(--main-bg);
+  color: var(--dark-text);
+  font-size: 14px;
+  transition: background 0.3s, color 0.3s;
+}
+
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--main-bg);
+  transition: background 0.3s;
+}
+
+
+.main-content {
+  flex: 1;
+  padding: 12px 20px 28px;
+  max-width: 1600px;
+  margin: 0 auto;
+  width: 100%;
+  background: var(--main-bg);
+  transition: background 0.3s;
+}
+
+.main-content.login-main-content {
+  padding: 0;
+  max-width: none;
+}
+
+
+.card {
+  background: var(--card-bg);
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  transition: background 0.3s, box-shadow 0.3s;
+}
+
+/* ===== FOOTER ===== */
+
+.app-footer {
+  text-align: center;
+  padding: 20px;
+  font-size: 13px;
+  color: var(--gray-text);
+  margin-top: auto;
+  background: var(--footer-bg);
+  border-top: 1px solid var(--border-light);
+  transition: background 0.3s, color 0.3s;
+}
+
+/* ===== PRINT STYLES ===== */
+@media print {
+  @page {
+    margin: 10mm;
+  }
+
+  body {
+    background-color: white !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    font-size: 9pt !important;
+  }
+
+  .header-wrapper {
+    position: relative !important;
+    box-shadow: none !important;
+    border-bottom: 2px solid #1a4a7c !important;
+    margin-bottom: 15px !important;
+    padding: 0 !important;
+  }
+
+  /* Hide navigation, top bar, and footer during print */
+  .header-top,
+  .header-nav,
+  .app-footer,
+  .btn,
+  .attendance-filters,
+  .sidebar,
+  .no-print,
+  .status-widget,
+  .modal-overlay {
+    display: none !important;
+  }
+
+  .main-content {
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: none !important;
+    width: 100% !important;
+  }
+
+  .admin-tab, .card, .inline-panel, .panel {
+    padding: 0 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+    width: 100% !important;
+  }
+
+  h3, h4 {
+    color: #1a4a7c !important;
+    margin-bottom: 10px !important;
+    font-size: 14pt !important;
+  }
+
+  /* Force table to fit page and wrap content */
+  .table-container {
+    overflow: visible !important;
+    width: 100% !important;
+  }
+
+  table {
+    width: 100% !important;
+    table-layout: auto !important;
+    border-collapse: collapse !important;
+    min-width: 0 !important; /* Remove min-width during print */
+  }
+
+  th, td {
+    border: 1px solid #dee2e6 !important;
+    padding: 4px 6px !important;
+    font-size: 8pt !important;
+    text-align: left !important;
+    word-break: break-all !important; /* Help with long strings */
+    white-space: normal !important; /* Allow wrapping */
+  }
+
+  th {
+    background-color: #f8f9fa !important;
+    color: #1a4a7c !important;
+  }
+
+  /* Hide columns that might be too wide or irrelevant for print */
+  .hide-print {
+    display: none !important;
+  }
+
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 640px) {
+  .main-content {
+    padding: 10px 14px 18px;
+  }
+
+  .main-content.login-main-content {
+    padding: 0;
+  }
+}

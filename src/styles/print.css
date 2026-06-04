@@ -1,0 +1,146 @@
+/* Print Stylesheet */
+
+/* Hide print-only elements in screen view */
+.print-only-header {
+  display: none;
+}
+
+@media print {
+  /* Basic print setup */
+  @page {
+    margin: 10mm;
+    size: auto;
+  }
+
+  /* Hide EVERYTHING by default */
+  body * {
+    visibility: hidden !important;
+  }
+
+  /* Show ONLY the printable section and its children, and the print-only header */
+  .printable, 
+  .printable *,
+  .print-only-header,
+  .print-only-header * {
+    visibility: visible !important;
+  }
+
+  /* Position the printable section and header at the very top of the page */
+  .print-only-header {
+    display: block !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    border-bottom: 2px solid #000 !important;
+    padding-bottom: 5px !important;
+    margin-bottom: 10px !important;
+    text-align: center !important;
+    z-index: 9999;
+  }
+
+  .printable {
+    display: block !important;
+    position: absolute !important;
+    top: 60px !important; /* Space for the header */
+    left: 0 !important;
+    width: 100% !important;
+  }
+
+  /* Card and container resets for print */
+  .card, .profile-overview-card, .table-container {
+    box-shadow: none !important;
+    border: none !important;
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+  }
+
+  /* Table styles for print */
+  table {
+    display: table !important;
+    width: 100% !important;
+    border-collapse: collapse !important;
+    table-layout: auto !important;
+  }
+
+  th, td {
+    display: table-cell !important;
+    border: 1px solid #ddd !important;
+    padding: 6px 8px !important;
+    text-align: left !important;
+    font-size: 9pt !important;
+    visibility: visible !important;
+  }
+
+  th {
+    background-color: #f2f2f2 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Page breaks */
+  tr {
+    display: table-row !important;
+    page-break-inside: avoid !important;
+    page-break-after: auto !important;
+  }
+
+  thead {
+    display: table-header-group !important;
+  }
+
+  tbody {
+    display: table-row-group !important;
+  }
+
+  /* Hide specific UI elements */
+  .no-print, 
+  .employee-tabs,
+  .dashboard-btn-logout,
+  .activity-filters {
+    display: none !important;
+  }
+
+  /* Keep icons visible but styled for print */
+  .action-icon-btn {
+    visibility: visible !important;
+    display: inline-flex !important;
+    opacity: 1 !important;
+    color: #000 !important;
+    background: none !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 4px !important;
+    box-shadow: none !important;
+    width: auto !important;
+    height: auto !important;
+  }
+
+  .action-icon-btn svg {
+    width: 14px !important;
+    height: 14px !important;
+    fill: #000 !important;
+    stroke: #000 !important;
+    visibility: visible !important;
+  }
+
+  /* Table density refinements */
+  table, thead, tbody, tr, td {
+    margin: 0 !important;
+    padding: 0 !important;
+    border-spacing: 0 !important;
+  }
+
+  tr {
+    height: auto !important;
+    min-height: 0 !important;
+  }
+
+  td, th {
+    padding: 4px 6px !important;
+    vertical-align: middle !important;
+    line-height: 1.2 !important;
+  }
+}

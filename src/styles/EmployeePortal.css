@@ -1,0 +1,141 @@
+/* ===== EMPLOYEE PORTAL ===== */
+.employee-portal {
+  width: 100%;
+}
+
+/* ===== SECTION STYLING ===== */
+.portal-section {
+  margin-bottom: 50px;
+}
+
+.section-title {
+  margin: 0 0 24px 0;
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--primary-blue);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.section-title::before {
+  content: "";
+  width: 4px;
+  height: 28px;
+  background-color: var(--primary-red);
+  border-radius: 2px;
+}
+
+/* ===== SHORTCUTS GRID ===== */
+.shortcuts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+/* ===== TWO COLUMN LAYOUT ===== */
+.two-column {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ===== METRICS GRID ===== */
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.metric-item {
+  background-color: var(--white);
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid var(--border-light);
+  text-align: center;
+  transition: all 0.3s;
+}
+
+.metric-item:hover {
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.metric-value {
+  display: block;
+  font-size: 32px;
+  font-weight: 900;
+  color: var(--primary-blue);
+  margin-bottom: 8px;
+}
+
+.metric-label {
+  display: block;
+  font-size: 12px;
+  color: var(--gray-text);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+/* ===== NOTICES GRID ===== */
+.notices-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 24px;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1024px) {
+  .two-column {
+    grid-template-columns: 1fr;
+  }
+
+  .shortcuts-grid {
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  }
+
+  .metrics-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .portal-section {
+    margin-bottom: 30px;
+  }
+
+  .section-title {
+    font-size: 18px;
+  }
+
+  .shortcuts-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .metrics-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .metric-value {
+    font-size: 24px;
+  }
+
+  .notices-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .shortcuts-grid {
+    grid-template-columns: 1fr;
+  }
+}

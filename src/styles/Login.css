@@ -1,0 +1,13 @@
+/* Legacy Login CSS - Redirect to Simple Login Styles */
+@import url("./LoginSimple.css");
+
+/* Keep any legacy styles that might be needed by old components */
+.admin-login-card {
+  max-width: 400px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.employee-login-form {
+  text-align: center;
+}

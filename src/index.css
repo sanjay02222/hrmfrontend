@@ -1,0 +1,231 @@
+@import "tailwindcss";
+
+/* ===== PREMIUM THEME TOKENS ===== */
+:root {
+  --bg-main: #f5f7fb;
+  --bg-secondary: #eef2f9;
+  --bg-card: #ffffff;
+  --bg-elevated: #f8fbff;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --border-subtle: rgba(15, 23, 42, 0.1);
+  --accent: #3b82f6;
+
+  /* Legacy aliases for existing styles */
+  --bg: var(--bg-main);
+  --card-bg: #ffffff;
+  --text: var(--text-primary);
+  --subtext: var(--text-secondary);
+  --primary: var(--accent);
+  --border: #e2e8f0;
+  --main-bg: var(--bg);
+  --light-bg: var(--bg-main);
+  --white: var(--card-bg);
+  --dark-text: var(--text);
+  --gray-text: var(--subtext);
+  --primary-blue: var(--primary);
+  --primary-red: #e31e24;
+  --border-light: var(--border-subtle);
+  --header-bg: color-mix(in srgb, var(--bg-card) 92%, transparent);
+  --header-gradient: linear-gradient(180deg, #f7fbff 0%, #f1f6fd 100%);
+  --footer-bg: var(--bg-card);
+  --shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+  --table-bg: var(--card-bg);
+  --table-head-bg: #f1f5f9;
+  --input-bg: var(--bg-elevated);
+  --input-text: var(--text);
+  --muted-bg: var(--bg-elevated);
+  --overlay-bg: rgba(15, 23, 42, 0.45);
+}
+
+body.dark-mode {
+  --bg-main: #0b1220;
+  --bg-secondary: #0f172a;
+  --bg-card: #111827;
+  --bg-elevated: #1f2937;
+  --text-primary: #e2e8f0;
+  --text-secondary: #94a3b8;
+  --border-subtle: rgba(255, 255, 255, 0.06);
+  --accent: #3b82f6;
+
+  --bg: var(--bg-main);
+  --card-bg: var(--bg-card);
+  --text: var(--text-primary);
+  --subtext: var(--text-secondary);
+  --primary: var(--accent);
+  --border: #334155;
+  --main-bg: var(--bg-main);
+  --light-bg: var(--bg-secondary);
+  --white: var(--card-bg);
+  --dark-text: var(--text);
+  --gray-text: var(--subtext);
+  --primary-blue: var(--primary);
+  --primary-red: #ef4444;
+  --border-light: var(--border-subtle);
+  --header-bg: color-mix(in srgb, var(--bg-card) 88%, transparent);
+  --header-gradient: linear-gradient(180deg, #111827 0%, #0f172a 100%);
+  --footer-bg: #0d1526;
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  --table-bg: var(--card-bg);
+  --table-head-bg: #1b2536;
+  --input-bg: var(--bg-secondary);
+  --input-text: var(--text-primary);
+  --muted-bg: var(--bg-elevated);
+  --overlay-bg: rgba(2, 6, 23, 0.7);
+}
+
+body {
+  background:
+    radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.05), transparent 38%),
+    radial-gradient(circle at 80% 0%, rgba(59, 130, 246, 0.06), transparent 30%),
+    var(--bg-main);
+  color: var(--text-primary);
+  transition: all 0.3s ease;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+body,
+body *,
+body *::before,
+body *::after {
+  transition: all 0.3s ease;
+}
+
+input,
+select,
+textarea,
+button {
+  font: inherit;
+}
+
+input,
+select,
+textarea {
+  background: var(--input-bg);
+  color: var(--input-text);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--gray-text);
+  opacity: 1;
+}
+
+table {
+  background: var(--table-bg);
+  color: var(--text-primary);
+}
+
+th {
+  background: var(--table-head-bg);
+}
+
+.card,
+.panel,
+.inline-panel,
+.modal-content,
+.table-container,
+.notices-section,
+.notice-item,
+.login-panel,
+.login-card,
+.sidebar,
+.employee-tabs,
+.security-panel,
+.profile-overview-card,
+.leave-update-card,
+.welcome-banner,
+.employee-header,
+.dashboard-summary-card {
+  background: var(--card-bg);
+  color: var(--text-primary);
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border-subtle);
+}
+
+.modal-overlay {
+  background: var(--overlay-bg);
+}
+
+/* Global readability coverage */
+p,
+span,
+small,
+label,
+td,
+th {
+  color: inherit;
+}
+
+a {
+  color: var(--primary);
+}
+
+/* Buttons */
+button,
+.btn,
+[class*="btn-"] {
+  border-color: var(--border-subtle);
+  transition: all 0.25s ease;
+}
+
+button:not([class*="danger"]):not([class*="logout"]),
+.btn-login,
+.dashboard-btn-primary,
+.btn-check-in {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: #e2e8f0;
+}
+
+button:hover,
+.btn:hover,
+[class*="btn-"]:hover {
+  transform: translateY(-2px);
+}
+
+button:active,
+.btn:active,
+[class*="btn-"]:active {
+  transform: scale(0.97);
+}
+
+body.dark-mode button:hover,
+body.dark-mode .btn:hover,
+body.dark-mode [class*="btn-"]:hover {
+  box-shadow: 0 12px 30px rgba(37, 99, 235, 0.4);
+}
+
+.card:hover,
+.notice-item:hover,
+.dashboard-summary-card:hover,
+.leave-update-card:hover {
+  transform: translateY(-4px);
+}
+
+body.dark-mode .card:hover,
+body.dark-mode .notice-item:hover,
+body.dark-mode .dashboard-summary-card:hover,
+body.dark-mode .leave-update-card:hover,
+body.dark-mode .table-container:hover {
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.35);
+}
+
+/* Force readable dark fallback for inline legacy colors */
+body.dark-mode [style*="background: #f"],
+body.dark-mode [style*="background-color: #f"] {
+  background: var(--card-bg) !important;
+  color: var(--text-primary) !important;
+}

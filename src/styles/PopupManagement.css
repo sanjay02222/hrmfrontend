@@ -1,0 +1,70 @@
+.popup-management-container {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+  padding: 2rem 1.5rem;
+  max-width: 480px;
+  margin: 2rem auto;
+}
+.popup-management-container h2 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: #1a4a7c;
+}
+.popup-form-group {
+  margin-bottom: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.popup-form-group label {
+  font-weight: 500;
+  color: #222;
+}
+.popup-form-group input[type="text"],
+.popup-form-group textarea,
+.popup-form-group select {
+  padding: 0.5rem 0.7rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 1rem;
+  background: #f9fafb;
+}
+.popup-form-group textarea {
+  resize: vertical;
+}
+.popup-image-preview {
+  margin-top: 0.5rem;
+  max-width: 100%;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+.popup-form-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 1.5rem;
+}
+.popup-btn {
+  background: #1a4a7c;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.6rem 1.4rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.popup-btn.secondary {
+  background: #e5e7eb;
+  color: #1a4a7c;
+}
+.popup-btn:hover {
+  background: #163a5c;
+}
+@media (max-width: 600px) {
+  .popup-management-container {
+    max-width: 98vw;
+    padding: 1rem 0.3rem;
+  }
+}
