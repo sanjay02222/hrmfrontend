@@ -46,9 +46,9 @@
 }
 
 .nav-item.active {
-  background-color: #e31e24; /* Solid Red from screenshot */
+  background-color: #22c55e; /* Green from Grace International */
   color: white;
-  border-color: #e31e24;
+  border-color: #22c55e;
 }
 
 .nav-icon {

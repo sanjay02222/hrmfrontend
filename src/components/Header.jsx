@@ -129,13 +129,9 @@ export default function Header({ theme, toggleTheme }) {
             </div>
 
             <div className="brand-info">
-              <h1 className="brand-name">GLOBAL EYE</h1>
-              <p className="brand-tagline">Education Consultancy Pvt. Ltd.</p>
+              <h1 className="brand-name">GRACE INTERNATIONAL</h1>
+              <p className="brand-tagline">Education | Migration</p>
               <div className="brand-divider" aria-hidden="true"></div>
-              <div className="brand-address-row">
-                <LocationPinIcon />
-                <span className="brand-address">Kathmandu, Butwal, Pokhara and Nepalgunj</span>
-              </div>
             </div>
           </div>
 

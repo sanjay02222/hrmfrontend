@@ -1706,7 +1706,7 @@ export default function AdminDashboardView({ onLogout, user }) {
                 </div>
               </div>
               <div className="print-only-header">
-                <h2>Global Eye - Detailed Employee List ({adminBranch})</h2>
+                <h2>Grace International - Detailed Employee List ({adminBranch})</h2>
                 <p>Generated on: {new Date().toLocaleString()}</p>
               </div>
               <div className="table-container printable" ref={tableRef}>
@@ -1741,7 +1741,7 @@ export default function AdminDashboardView({ onLogout, user }) {
       {activeTab === "attendance" && (
         <div className="employee-tab">
           <div className="print-only-header">
-            <h2>Global Eye - Branch Attendance Report ({adminBranch})</h2>
+            <h2>Grace International - Branch Attendance Report ({adminBranch})</h2>
             <p>Generated on: {new Date().toLocaleString()}</p>
           </div>
           <div className="no-print" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "20px", background: "#f8fafc", padding: "15px", borderRadius: "10px", border: "1px solid #e2e8f0", gap: "15px", flexWrap: "wrap" }}>

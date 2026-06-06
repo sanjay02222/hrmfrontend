@@ -24,7 +24,7 @@ export default function EmployeeDashboard({ employee, onLogout }) {
           <h2>Consultancy Notice Board</h2>
           <p>
             Stay updated with the latest office notices, announcements, and
-            shared photos from Global Eye.
+            shared photos from Grace International.
           </p>
         </div>
 

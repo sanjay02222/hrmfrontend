@@ -1633,7 +1633,7 @@ export default function SuperAdminDashboardView({ onLogout, user }) {
                 </div>
               </div>
               <div className="print-only-header">
-                <h2>Global Eye - Detailed Employee List</h2>
+                <h2>Grace International - Detailed Employee List</h2>
                 <p>Generated on: {new Date().toLocaleString()}</p>
               </div>
               <div className="table-container printable" ref={tableRef}>
@@ -1776,7 +1776,7 @@ export default function SuperAdminDashboardView({ onLogout, user }) {
       {activeTab === "attendance" && (
         <div className="employee-tab">
           <div className="print-only-header">
-            <h2>Global Eye - All Attendance Report</h2>
+            <h2>Grace International - All Attendance Report</h2>
             <p>Generated on: {new Date().toLocaleString()}</p>
           </div>
           <div className="no-print" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", gap: 12, flexWrap: "wrap", marginBottom: 20, background: "#f8fafc", padding: "15px", borderRadius: "10px", border: "1px solid #e2e8f0" }}>

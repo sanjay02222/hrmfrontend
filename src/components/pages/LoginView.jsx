@@ -302,12 +302,6 @@ export default function LoginView({ onLogin, role }) {
 
               <div className="branding-section-divider"></div>
 
-              <div className="branch-presence-panel">
-                <div className="branch-names-line">
-                  Kathmandu &nbsp;|&nbsp; Butwal &nbsp;|&nbsp; Pokhara &nbsp;|&nbsp; Nepalgunj
-                </div>
-              </div>
-
               <div className="branding-time-block">
                 <div className="time-block-title">Headquarters Time</div>
                 <div className="time-block-zone">NPT (GMT +5:45)</div>
@@ -319,7 +313,7 @@ export default function LoginView({ onLogin, role }) {
               <div className="login-clock-panel">
                 <div className="clock-greeting">{greeting}</div>
                 <div className="clock-support-text">
-                  Welcome back to Global Eye HR Portal
+                  Welcome back to Grace International HR Portal
                 </div>
                 <div className="clock-time">{formattedTime}</div>
                 <div className="clock-date">{formattedDate}</div>
@@ -399,7 +393,7 @@ export default function LoginView({ onLogin, role }) {
                   : "Employee Portal"}
               </h2>
               <p className="login-subtitle">
-                Global Eye HR Management System
+                Grace International HR Management System
               </p>
             </div>
           )}

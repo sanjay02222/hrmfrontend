@@ -219,7 +219,7 @@ function App() {
       </main>
       {showFooter && (
         <footer className="app-footer">
-          &copy; {new Date().getFullYear()} Global Eye. All rights reserved.
+          &copy; {new Date().getFullYear()} Grace International. All rights reserved.
         </footer>
       )}
       <ToastContainer position="top-right" autoClose={3000} hideProgressBar theme={theme === 'dark' ? 'dark' : 'light'} />

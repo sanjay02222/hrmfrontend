@@ -10,7 +10,7 @@ export function GELogo() {
     }}>
       <img
         src="/logo.jpeg"
-        alt="Global Eye Logo"
+        alt="Grace International Logo"
         style={{
           width: '100%',
           height: '100%',

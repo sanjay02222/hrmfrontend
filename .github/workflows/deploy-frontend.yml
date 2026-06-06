@@ -1,100 +1,100 @@
-name: 🚀 Deploy Frontend to cPanel (Production)
+# name: 🚀 Deploy Frontend to cPanel (Production)
 
-on:
-  push:
-    branches:
-      - main
+# on:
+#   push:
+#     branches:
+#       - main
 
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
+# jobs:
+#   deploy:
+#     runs-on: ubuntu-latest
 
-    steps:
-      # 1. Checkout repo
-      - name: 📥 Checkout Code
-        uses: actions/checkout@v3
+#     steps:
+#       # 1. Checkout repo
+#       - name: 📥 Checkout Code
+#         uses: actions/checkout@v3
 
-      # 2. Setup Node.js
-      - name: ⚙️ Setup Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 20
+#       # 2. Setup Node.js
+#       - name: ⚙️ Setup Node
+#         uses: actions/setup-node@v3
+#         with:
+#           node-version: 20
 
-      # 3. Install dependencies
-      - name: 📦 Install Dependencies
-        run: npm ci
+#       # 3. Install dependencies
+#       - name: 📦 Install Dependencies
+#         run: npm ci
 
-      # 4. Build project
-      - name: 🏗 Build Vite App
-        run: npm run build
+#       # 4. Build project
+#       - name: 🏗 Build Vite App
+#         run: npm run build
 
-      # 5. Verify build output
-      - name: 🔍 Check dist folder
-        run: |
-          echo "Checking build output..."
-          ls -la dist
-          if [ ! -f "dist/index.html" ]; then
-            echo "❌ Build failed: index.html not found"
-            exit 1
-          fi
+#       # 5. Verify build output
+#       - name: 🔍 Check dist folder
+#         run: |
+#           echo "Checking build output..."
+#           ls -la dist
+#           if [ ! -f "dist/index.html" ]; then
+#             echo "❌ Build failed: index.html not found"
+#             exit 1
+#           fi
 
-      # 6. Clean target folder (safe reset)
-      - name: 🧹 Clean server folder
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.CPANEL_HOST }}
-          username: ${{ secrets.CPANEL_USERNAME }}
-          key: ${{ secrets.CPANEL_SSH_KEY }}
-          port: ${{ secrets.CPANEL_PORT }}
-          script: |
-            echo "Cleaning old files..."
-            rm -rf /home2/globaley/public_html/hrm/*
-            mkdir -p /home2/globaley/public_html/hrm
+#       # 6. Clean target folder (safe reset)
+#       - name: 🧹 Clean server folder
+#         uses: appleboy/ssh-action@master
+#         with:
+#           host: ${{ secrets.CPANEL_HOST }}
+#           username: ${{ secrets.CPANEL_USERNAME }}
+#           key: ${{ secrets.CPANEL_SSH_KEY }}
+#           port: ${{ secrets.CPANEL_PORT }}
+#           script: |
+#             echo "Cleaning old files..."
+#             rm -rf /home2/globaley/public_html/hrm/*
+#             mkdir -p /home2/globaley/public_html/hrm
 
-      # 7. Upload ONLY dist contents (CRITICAL)
-      - name: 🚚 Upload build files
-        uses: appleboy/scp-action@master
-        with:
-          host: ${{ secrets.CPANEL_HOST }}
-          username: ${{ secrets.CPANEL_USERNAME }}
-          key: ${{ secrets.CPANEL_SSH_KEY }}
-          port: ${{ secrets.CPANEL_PORT }}
-          source: "dist/*"
-          target: "/home2/globaley/public_html/hrm"
-          strip_components: 1
+#       # 7. Upload ONLY dist contents (CRITICAL)
+#       - name: 🚚 Upload build files
+#         uses: appleboy/scp-action@master
+#         with:
+#           host: ${{ secrets.CPANEL_HOST }}
+#           username: ${{ secrets.CPANEL_USERNAME }}
+#           key: ${{ secrets.CPANEL_SSH_KEY }}
+#           port: ${{ secrets.CPANEL_PORT }}
+#           source: "dist/*"
+#           target: "/home2/globaley/public_html/hrm"
+#           strip_components: 1
 
-      # 8. Add .htaccess (SPA fix)
-      - name: 🧩 Setup .htaccess
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.CPANEL_HOST }}
-          username: ${{ secrets.CPANEL_USERNAME }}
-          key: ${{ secrets.CPANEL_SSH_KEY }}
-          port: ${{ secrets.CPANEL_PORT }}
-          script: |
-            cat << 'EOF' > /home2/globaley/public_html/hrm/.htaccess
-            RewriteEngine On
-            RewriteBase /
+#       # 8. Add .htaccess (SPA fix)
+#       - name: 🧩 Setup .htaccess
+#         uses: appleboy/ssh-action@master
+#         with:
+#           host: ${{ secrets.CPANEL_HOST }}
+#           username: ${{ secrets.CPANEL_USERNAME }}
+#           key: ${{ secrets.CPANEL_SSH_KEY }}
+#           port: ${{ secrets.CPANEL_PORT }}
+#           script: |
+#             cat << 'EOF' > /home2/globaley/public_html/hrm/.htaccess
+#             RewriteEngine On
+#             RewriteBase /
 
-            RewriteRule ^index\.html$ - [L]
+#             RewriteRule ^index\.html$ - [L]
 
-            RewriteCond %{REQUEST_FILENAME} !-f
-            RewriteCond %{REQUEST_FILENAME} !-d
+#             RewriteCond %{REQUEST_FILENAME} !-f
+#             RewriteCond %{REQUEST_FILENAME} !-d
 
-            RewriteRule . /index.html [L]
-            EOF
+#             RewriteRule . /index.html [L]
+#             EOF
 
-      # 9. Fix permissions
-      - name: 🔐 Set permissions
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.CPANEL_HOST }}
-          username: ${{ secrets.CPANEL_USERNAME }}
-          key: ${{ secrets.CPANEL_SSH_KEY }}
-          port: ${{ secrets.CPANEL_PORT }}
-          script: |
-            chmod -R 755 /home2/globaley/public_html/hrm
+#       # 9. Fix permissions
+#       - name: 🔐 Set permissions
+#         uses: appleboy/ssh-action@master
+#         with:
+#           host: ${{ secrets.CPANEL_HOST }}
+#           username: ${{ secrets.CPANEL_USERNAME }}
+#           key: ${{ secrets.CPANEL_SSH_KEY }}
+#           port: ${{ secrets.CPANEL_PORT }}
+#           script: |
+#             chmod -R 755 /home2/globaley/public_html/hrm
 
-      # 10. Done
-      - name: ✅ Done
-        run: echo "🎉 Deployment successful!"
+#       # 10. Done
+#       - name: ✅ Done
+#         run: echo "🎉 Deployment successful!"

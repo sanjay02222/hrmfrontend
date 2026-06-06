@@ -24,7 +24,7 @@ export default function AdminLogin({ onLogin }) {
       <div className="login-card">
         <div className="login-header">
           <h2>Admin Access</h2>
-          <p>Global Eye HR Management System</p>
+          <p>Grace International HR Management System</p>
         </div>
 
         <form onSubmit={handleSubmit} className="login-form">

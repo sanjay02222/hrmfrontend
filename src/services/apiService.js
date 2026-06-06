@@ -1,150 +1,353 @@
 /**
- * Backend origin (JSON API + `/uploads/...` static files). Flip the active line below.
- * `authService` imports this — change only here.
+ * Grace International HRM System - Mock API Service
+ * This service provides mock data instead of connecting to a backend
+ * No backend connection required for demo/development
  */
-// const API_BASE_URL = "http://localhost:3000";
-const API_BASE_URL = "https://hrmapi.globaleyeedu.com.np";
 
+import {
+  mockEmployees,
+  mockAttendance,
+  mockLeaveRequests,
+  mockNotices,
+  mockHolidays,
+  mockGlobalSettings,
+  mockPopups,
+  mockIpSettings,
+  mockBranchNetwork,
+  mockAuth,
+  mockLoginResponse,
+  delay,
+} from "./mockData";
+
+// Mock API base URL (not used, just for compatibility)
+const API_BASE_URL = "MOCK_MODE";
 export { API_BASE_URL };
 
-const getAccessTokenFromCookie = () => {
-  if (typeof document === "undefined") return null;
-  const tokenCookie = document.cookie
-    .split(";")
-    .find((cookie) => cookie.trim().startsWith("access_token="));
-  return tokenCookie ? tokenCookie.split("=")[1] : null;
+// In-memory storage for mock data (simulates database)
+let mockDataStore = {
+  employees: JSON.parse(JSON.stringify(mockEmployees)),
+  attendance: JSON.parse(JSON.stringify(mockAttendance)),
+  leaveRequests: JSON.parse(JSON.stringify(mockLeaveRequests)),
+  notices: JSON.parse(JSON.stringify(mockNotices)),
+  holidays: JSON.parse(JSON.stringify(mockHolidays)),
+  globalSettings: JSON.parse(JSON.stringify(mockGlobalSettings)),
+  popups: JSON.parse(JSON.stringify(mockPopups)),
+  ipSettings: JSON.parse(JSON.stringify(mockIpSettings)),
+  branchNetwork: JSON.parse(JSON.stringify(mockBranchNetwork)),
 };
 
-/** Multipart field name must match backend multer: `photo` (see globaleye backend controllers). */
-function buildPhotoFormData(file, fieldName = "photo") {
-  if (!(file instanceof Blob)) {
-    throw new Error("Image upload requires a File or Blob");
-  }
-  const formData = new FormData();
-  const name =
-    file instanceof File &&
-    typeof file.name === "string" &&
-    file.name.trim()
-      ? file.name
-      : "upload.jpg";
-  formData.append(fieldName, file, name);
-  return formData;
-}
+// Helper to generate unique IDs
+const generateId = (array) => {
+  if (!array || array.length === 0) return 1;
+  return Math.max(...array.map((item) => item.id || 0)) + 1;
+};
+
+// Helper to find item by ID
+const findById = (array, id) => array?.find((item) => item.id === parseInt(id));
+
+// Helper to filter array
+const filterArray = (array, predicate) => array?.filter(predicate) || [];
 
 export const apiService = {
-  // Helper to get full image URL
+  // Helper to get full image URL (mock always returns placeholder)
   getImageUrl(path) {
     if (!path) return null;
-
-    // Diagnostic logging to catch remaining base64/blob usage in production
-    if (path.startsWith("data:")) {
-      console.warn("API Service: Suppressing legacy base64 image string.");
-      return null;
-    }
-
-    if (path.startsWith("blob:")) {
-      // Blob URLs are temporary and fine for previews, but should not be persisted
-      return path;
-    }
-
+    if (path.startsWith("data:")) return null;
+    if (path.startsWith("blob:")) return path;
     if (path.startsWith("http")) return path;
-
-    // Prepend API_BASE_URL if it's a relative path starting with /uploads
-    // Ensure nested paths like /uploads/admins/xyz.jpg are handled
-    const cleanPath = path.startsWith("/") ? path : `/${path}`;
-    return `${API_BASE_URL}${cleanPath}`;
+    // For mock mode, return path as-is
+    return path;
   },
 
-  // Generic API call method
+  // Mock API call method
   async apiCall(endpoint, options = {}) {
-    try {
-      const {
-        silentOnError = false,
-        headers: callerHeaders,
-        ...requestOptions
-      } = options;
-      if (!silentOnError) {
-        console.log(`API Service: Calling ${endpoint}`);
+    await delay(200); // Simulate network delay
+    console.log(`[MOCK API] ${options.method || "GET"} ${endpoint}`);
+    
+    // Handle different endpoints
+    if (endpoint === "/employees") {
+      if (options.method === "POST") {
+        const newEmployee = {
+          id: generateId(mockDataStore.employees),
+          ...JSON.parse(options.body),
+          createdAt: new Date().toISOString(),
+        };
+        mockDataStore.employees.push(newEmployee);
+        return newEmployee;
       }
-      const token = getAccessTokenFromCookie();
-      const hasBody = requestOptions.body !== undefined && requestOptions.body !== null;
-      const isFormData =
-        typeof FormData !== "undefined" &&
-        hasBody &&
-        requestOptions.body instanceof FormData;
-
-      const defaultHeaders = {
-        ...(isFormData ? {} : { "Content-Type": "application/json" }),
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      };
-
-      // Never spread `options` after `headers` — `headers: {}` would replace merged auth headers.
-      const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-        ...requestOptions,
-        credentials: "include",
-        headers: {
-          ...defaultHeaders,
-          ...(callerHeaders || {}),
-        },
-      });
-
-      if (!silentOnError) {
-        console.log(`API Service: ${endpoint} response status:`, response.status);
-      }
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        let backendMessage = "";
-        if (errorText) {
-          try {
-            const parsed = JSON.parse(errorText);
-            backendMessage =
-              parsed?.message ||
-              parsed?.error ||
-              (typeof parsed === "string" ? parsed : "");
-          } catch {
-            backendMessage = errorText;
-          }
-        }
-        throw new Error(
-          backendMessage
-            ? `API call failed: ${response.status} - ${backendMessage}`
-            : `API call failed: ${response.status}`,
-        );
-      }
-
-      const text = await response.text();
-      if (!silentOnError) {
-        console.log(`API Service: ${endpoint} response text:`, text);
-      }
-
-      // Handle empty responses
-      if (!text) {
-        if (!silentOnError) {
-          console.log(`API Service: ${endpoint} returned empty response`);
-        }
-        return null;
-      }
-
-      try {
-        const data = JSON.parse(text);
-        if (!silentOnError) {
-          console.log(`API Service: ${endpoint} response data:`, data);
-        }
-        return data;
-      } catch (parseError) {
-        console.error(
-          `API Service: JSON parse error for ${endpoint}:`,
-          parseError,
-        );
-        throw new Error(`Invalid JSON response from ${endpoint}`);
-      }
-    } catch (error) {
-      if (!options.silentOnError) {
-        console.error(`API Service: Error calling ${endpoint}:`, error);
-      }
-      throw error;
+      return mockDataStore.employees;
     }
+
+    if (endpoint.startsWith("/employees/") && !endpoint.includes("/photo")) {
+      const id = parseInt(endpoint.split("/")[2]);
+      if (options.method === "PATCH") {
+        const emp = findById(mockDataStore.employees, id);
+        if (emp) {
+          Object.assign(emp, JSON.parse(options.body));
+          return emp;
+        }
+        throw new Error(`Employee ${id} not found`);
+      }
+      if (options.method === "DELETE") {
+        mockDataStore.employees = mockDataStore.employees.filter(
+          (e) => e.id !== id
+        );
+        return { success: true };
+      }
+      return findById(mockDataStore.employees, id);
+    }
+
+    // Attendance endpoints
+    if (endpoint === "/attendance") {
+      if (options.method === "POST") {
+        const newAttendance = {
+          id: generateId(mockDataStore.attendance),
+          ...JSON.parse(options.body),
+          createdAt: new Date().toISOString(),
+        };
+        mockDataStore.attendance.push(newAttendance);
+        return newAttendance;
+      }
+      return mockDataStore.attendance;
+    }
+
+    if (endpoint.startsWith("/attendance/employee/")) {
+      const employeeId = parseInt(endpoint.split("/")[3]);
+      return filterArray(mockDataStore.attendance, (a) => a.employeeId === employeeId);
+    }
+
+    if (endpoint.startsWith("/attendance/")) {
+      const id = parseInt(endpoint.split("/")[2]);
+      if (options.method === "PATCH") {
+        const att = findById(mockDataStore.attendance, id);
+        if (att) {
+          Object.assign(att, JSON.parse(options.body));
+          return att;
+        }
+      }
+      if (options.method === "DELETE") {
+        mockDataStore.attendance = mockDataStore.attendance.filter(
+          (a) => a.id !== id
+        );
+        return { success: true };
+      }
+      return findById(mockDataStore.attendance, id);
+    }
+
+    // Leave Requests endpoints
+    if (endpoint === "/leave-requests") {
+      if (options.method === "POST") {
+        const newLeave = {
+          id: generateId(mockDataStore.leaveRequests),
+          ...JSON.parse(options.body),
+          createdAt: new Date().toISOString(),
+        };
+        mockDataStore.leaveRequests.push(newLeave);
+        return newLeave;
+      }
+      return mockDataStore.leaveRequests;
+    }
+
+    if (endpoint.startsWith("/leave-requests/")) {
+      const parts = endpoint.split("/");
+      const id = parseInt(parts[2]);
+
+      if (endpoint.includes("/approve")) {
+        const leave = findById(mockDataStore.leaveRequests, id);
+        if (leave) {
+          leave.status = "approved";
+          leave.approvedBy = JSON.parse(options.body).approvedBy;
+          return leave;
+        }
+      }
+
+      if (endpoint.includes("/reject")) {
+        const leave = findById(mockDataStore.leaveRequests, id);
+        if (leave) {
+          leave.status = "rejected";
+          return leave;
+        }
+      }
+
+      if (endpoint.includes("/employee/")) {
+        const employeeId = parseInt(parts[3]);
+        return filterArray(mockDataStore.leaveRequests, (l) => l.employeeId === employeeId);
+      }
+
+      if (options.method === "PATCH") {
+        const leave = findById(mockDataStore.leaveRequests, id);
+        if (leave) {
+          Object.assign(leave, JSON.parse(options.body));
+          return leave;
+        }
+      }
+
+      if (options.method === "DELETE") {
+        mockDataStore.leaveRequests = mockDataStore.leaveRequests.filter(
+          (l) => l.id !== id
+        );
+        return { success: true };
+      }
+
+      return findById(mockDataStore.leaveRequests, id);
+    }
+
+    // Notices endpoints
+    if (endpoint === "/notices" || endpoint === "/notices/active") {
+      if (options.method === "POST") {
+        const newNotice = {
+          id: generateId(mockDataStore.notices),
+          ...JSON.parse(options.body),
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        };
+        mockDataStore.notices.push(newNotice);
+        return newNotice;
+      }
+      if (endpoint === "/notices/active") {
+        return filterArray(mockDataStore.notices, (n) => n.isActive);
+      }
+      return mockDataStore.notices;
+    }
+
+    if (endpoint.startsWith("/notices/")) {
+      const id = parseInt(endpoint.split("/")[2]);
+
+      if (endpoint.includes("/toggle")) {
+        const notice = findById(mockDataStore.notices, id);
+        if (notice) {
+          notice.isActive = !notice.isActive;
+          return notice;
+        }
+      }
+
+      if (options.method === "PATCH") {
+        const notice = findById(mockDataStore.notices, id);
+        if (notice) {
+          Object.assign(notice, JSON.parse(options.body));
+          notice.updatedAt = new Date().toISOString();
+          return notice;
+        }
+      }
+
+      if (options.method === "DELETE") {
+        mockDataStore.notices = mockDataStore.notices.filter((n) => n.id !== id);
+        return { success: true };
+      }
+
+      return findById(mockDataStore.notices, id);
+    }
+
+    // Holidays endpoints
+    if (endpoint === "/holidays") {
+      if (options.method === "POST") {
+        const newHoliday = {
+          id: generateId(mockDataStore.holidays),
+          ...JSON.parse(options.body),
+        };
+        mockDataStore.holidays.push(newHoliday);
+        return newHoliday;
+      }
+      return mockDataStore.holidays;
+    }
+
+    if (endpoint.startsWith("/holidays/")) {
+      const id = parseInt(endpoint.split("/")[2]);
+      if (options.method === "PATCH") {
+        const holiday = findById(mockDataStore.holidays, id);
+        if (holiday) {
+          Object.assign(holiday, JSON.parse(options.body));
+          return holiday;
+        }
+      }
+      if (options.method === "DELETE") {
+        mockDataStore.holidays = mockDataStore.holidays.filter((h) => h.id !== id);
+        return { success: true };
+      }
+      return findById(mockDataStore.holidays, id);
+    }
+
+    // Global Settings
+    if (endpoint === "/global-settings") {
+      if (options.method === "PATCH") {
+        Object.assign(mockDataStore.globalSettings, JSON.parse(options.body));
+      }
+      return mockDataStore.globalSettings;
+    }
+
+    // Popups
+    if (endpoint === "/popups") {
+      if (options.method === "PATCH") {
+        Object.assign(mockDataStore.popups, JSON.parse(options.body));
+      }
+      return mockDataStore.popups;
+    }
+
+    // IP Settings
+    if (endpoint === "/ip-settings" || endpoint === "/ip-settings/active") {
+      if (options.method === "POST") {
+        const newIpSetting = {
+          id: generateId(mockDataStore.ipSettings),
+          ...JSON.parse(options.body),
+        };
+        mockDataStore.ipSettings.push(newIpSetting);
+        return newIpSetting;
+      }
+      if (endpoint === "/ip-settings/active") {
+        return filterArray(mockDataStore.ipSettings, (ip) => ip.isActive)[0] || null;
+      }
+      return mockDataStore.ipSettings;
+    }
+
+    if (endpoint.startsWith("/ip-settings/")) {
+      const id = parseInt(endpoint.split("/")[2]);
+      if (options.method === "PATCH") {
+        const ipSetting = findById(mockDataStore.ipSettings, id);
+        if (ipSetting) {
+          Object.assign(ipSetting, JSON.parse(options.body));
+          return ipSetting;
+        }
+      }
+      if (options.method === "DELETE") {
+        mockDataStore.ipSettings = mockDataStore.ipSettings.filter(
+          (ip) => ip.id !== id
+        );
+        return { success: true };
+      }
+      return findById(mockDataStore.ipSettings, id);
+    }
+
+    // Branch Network
+    if (endpoint === "/branch-network-settings") {
+      if (options.method === "POST") {
+        const newBranch = {
+          id: generateId(mockDataStore.branchNetwork),
+          ...JSON.parse(options.body),
+        };
+        mockDataStore.branchNetwork.push(newBranch);
+        return newBranch;
+      }
+      return mockDataStore.branchNetwork;
+    }
+
+    if (endpoint.startsWith("/branch-network-settings/")) {
+      const branch = endpoint.split("/")[2];
+      if (options.method === "DELETE") {
+        mockDataStore.branchNetwork = mockDataStore.branchNetwork.filter(
+          (b) => b.branch !== decodeURIComponent(branch)
+        );
+        return { success: true };
+      }
+      return (
+        mockDataStore.branchNetwork.find(
+          (b) => b.branch === decodeURIComponent(branch)
+        ) || null
+      );
+    }
+
+    // Catch-all for unmapped endpoints
+    console.warn(`[MOCK API] Endpoint not mapped: ${endpoint}`);
+    return null;
   },
 
   // Employees API
@@ -165,23 +368,10 @@ export const apiService = {
       apiService.apiCall(`/employees/${id}`, {
         method: "DELETE",
       }),
-    deleteBySuperAdmin: (id) =>
-      apiService.apiCall(`/employees/${id}/superadmin`, {
-        method: "DELETE",
-      }),
-    updatePhoto: (id, formData) =>
-      apiService.apiCall(`/employees/${id}/photo`, {
-        method: "PATCH",
-        body: formData,
-      }),
-    /** PATCH multipart field `photo` → backend saves compressed JPEG under /uploads/employees/ */
-    uploadPhoto: (id, file) =>
-      apiService.apiCall(`/employees/${id}/photo`, {
-        method: "PATCH",
-        body: buildPhotoFormData(file, "photo"),
-      }),
-    getAttendanceStats: (id) =>
-      apiService.apiCall(`/employees/${id}/attendance-stats`),
+    deleteBySuperAdmin: (id) => apiService.apiCall(`/employees/${id}/superadmin`, { method: "DELETE" }),
+    updatePhoto: (id, formData) => Promise.resolve({ success: true }),
+    uploadPhoto: (id, file) => Promise.resolve({ success: true }),
+    getAttendanceStats: (id) => Promise.resolve({ present: 20, absent: 2, late: 1 }),
   },
 
   // Attendance API
@@ -202,27 +392,10 @@ export const apiService = {
       apiService.apiCall(`/attendance/${id}`, {
         method: "DELETE",
       }),
-    checkIn: (employeeId, data) =>
-      apiService.apiCall(`/attendance/check-in/${employeeId}`, {
-        method: "POST",
-        body: JSON.stringify(data),
-      }),
-    checkOut: (attendanceId, data) =>
-      apiService.apiCall(`/attendance/check-out/${attendanceId}`, {
-        method: "POST",
-        body: JSON.stringify(data),
-      }),
-    getReport: (params) => {
-      const cleanParams = Object.fromEntries(Object.entries(params).filter(([_, v]) => v !== undefined));
-      const queryString = new URLSearchParams(cleanParams).toString();
-      return apiService.apiCall(`/attendance/report?${queryString}`);
-    },
-    getByEmployee: (employeeId, params = {}) => {
-      const cleanParams = Object.fromEntries(Object.entries(params).filter(([_, v]) => v !== undefined));
-      const queryString = new URLSearchParams(cleanParams).toString();
-      const url = `/attendance/employee/${employeeId}${queryString ? `?${queryString}` : ""}`;
-      return apiService.apiCall(url);
-    },
+    checkIn: (employeeId, data) => apiService.apiCall(`/attendance/check-in/${employeeId}`, { method: "POST", body: JSON.stringify(data) }),
+    checkOut: (attendanceId, data) => apiService.apiCall(`/attendance/check-out/${attendanceId}`, { method: "POST", body: JSON.stringify(data) }),
+    getReport: (params) => apiService.apiCall("/attendance/report", { silentOnError: true }),
+    getByEmployee: (employeeId, params = {}) => apiService.apiCall(`/attendance/employee/${employeeId}`),
   },
 
   // Leave Requests API
@@ -253,11 +426,9 @@ export const apiService = {
         method: "POST",
         body: JSON.stringify(data),
       }),
-    getStats: () => apiService.apiCall("/leave-requests/stats"),
-    getByStatus: (status) =>
-      apiService.apiCall(`/leave-requests/status/${status}`),
-    getByEmployee: (employeeId) =>
-      apiService.apiCall(`/leave-requests/employee/${employeeId}`),
+    getStats: () => Promise.resolve({ pending: 2, approved: 8, rejected: 1 }),
+    getByStatus: (status) => apiService.apiCall(`/leave-requests/status/${status}`, { silentOnError: true }),
+    getByEmployee: (employeeId) => apiService.apiCall(`/leave-requests/employee/${employeeId}`),
   },
 
   // Notices API
@@ -279,31 +450,17 @@ export const apiService = {
         method: "DELETE",
       }),
     getActive: () => apiService.apiCall("/notices/active"),
-    getByType: (type) => apiService.apiCall(`/notices/type/${type}`),
+    getByType: (type) => apiService.apiCall(`/notices/type/${type}`, { silentOnError: true }),
     toggleActive: (id) =>
       apiService.apiCall(`/notices/${id}/toggle`, {
         method: "POST",
       }),
-    updatePhoto: (id, formData) =>
-      apiService.apiCall(`/notices/${id}/photo`, {
-        method: "PATCH",
-        body: formData,
-      }),
-    /** PATCH multipart field `photo` (backend also accepts `file`). */
-    uploadPhoto: (id, file) =>
-      apiService.apiCall(`/notices/${id}/photo`, {
-        method: "PATCH",
-        body: buildPhotoFormData(file, "photo"),
-      }),
+    updatePhoto: (id, formData) => Promise.resolve({ success: true }),
+    uploadPhoto: (id, file) => Promise.resolve({ success: true }),
   },
 
   auth: {
-    /** PATCH multipart field `photo` for managed admin / executive profile image */
-    updateAdminPhoto: (adminId, file) =>
-      apiService.apiCall(`/auth/admins/${adminId}/photo`, {
-        method: "PATCH",
-        body: buildPhotoFormData(file, "photo"),
-      }),
+    updateAdminPhoto: (adminId, file) => Promise.resolve({ success: true }),
   },
 
   // IP Settings API
@@ -325,80 +482,26 @@ export const apiService = {
         method: "DELETE",
       }),
     getActive: () => apiService.apiCall("/ip-settings/active"),
-    validate: () =>
-      apiService.apiCall("/ip-settings/validate", {
-        method: "POST",
-      }),
+    validate: () => Promise.resolve({ valid: true }),
     toggle: (id) => apiService.apiCall(`/ip-settings/${id}/toggle`, { method: "POST" }),
-    getMyIp: () => apiService.apiCall("/ip-settings/my-ip"),
-    addAllowedIp: (id, ipAddress) =>
-      apiService.apiCall(`/ip-settings/${id}/add-ip`, {
-        method: "POST",
-        body: JSON.stringify({ ipAddress }),
-      }),
-    removeAllowedIp: (id, ipAddress) =>
-      apiService.apiCall(`/ip-settings/${id}/remove-ip`, {
-        method: "POST",
-        body: JSON.stringify({ ipAddress }),
-      }),
+    getMyIp: () => Promise.resolve({ ip: "192.168.1.100" }),
+    addAllowedIp: (id, ipAddress) => Promise.resolve({ success: true }),
+    removeAllowedIp: (id, ipAddress) => Promise.resolve({ success: true }),
   },
 
   // Branch Network Restriction API
   branchNetwork: {
-    getByBranch: async (branch) => {
-      const safeBranch = encodeURIComponent(String(branch || "").trim());
-      try {
-        return await apiService.apiCall(`/branch-network-settings/${safeBranch}`, {
-          silentOnError: true,
-        });
-      } catch {
-        try {
-          return await apiService.apiCall(`/branch-network-settings?branch=${safeBranch}`, {
-            silentOnError: true,
-          });
-        } catch {
-          // Backward compatible fallback: use active ip settings if dedicated endpoint is unavailable.
-          const active = await apiService.apiCall("/ip-settings/active", {
-            silentOnError: true,
-          });
-          return active || null;
-        }
-      }
-    },
-    upsert: async ({ branch, allowedIpAddress }) => {
-      const payload = {
-        branch: String(branch || "").trim(),
-        allowedIpAddress: String(allowedIpAddress || "").trim(),
-      };
-      try {
-        return await apiService.apiCall("/branch-network-settings", {
-          method: "POST",
-          body: JSON.stringify(payload),
-        });
-      } catch {
-        return await apiService.apiCall("/ip-settings", {
-          method: "POST",
-          body: JSON.stringify(payload),
-        });
-      }
-    },
-    getAll: async () => {
-      return await apiService.apiCall("/branch-network-settings");
-    },
-    deleteByBranch: async (branch) => {
-      const safeBranch = encodeURIComponent(String(branch || "").trim());
-      try {
-        return await apiService.apiCall(`/branch-network-settings/${safeBranch}`, {
-          method: "DELETE",
-        });
-      } catch {
-        const current = await apiService.branchNetwork.getByBranch(branch);
-        if (current?.id) {
-          return await apiService.ipSettings.delete(current.id);
-        }
-        return null;
-      }
-    },
+    getByBranch: (branch) => apiService.apiCall(`/branch-network-settings/${encodeURIComponent(branch)}`),
+    upsert: async ({ branch, allowedIpAddress }) =>
+      apiService.apiCall("/branch-network-settings", {
+        method: "POST",
+        body: JSON.stringify({ branch, allowedIpAddress }),
+      }),
+    getAll: async () => apiService.apiCall("/branch-network-settings"),
+    deleteByBranch: (branch) =>
+      apiService.apiCall(`/branch-network-settings/${encodeURIComponent(branch)}`, {
+        method: "DELETE",
+      }),
   },
 
   // Global Settings API
@@ -413,10 +516,7 @@ export const apiService = {
 
   // Holidays API
   holidays: {
-    getAll: (params) => {
-      const queryString = new URLSearchParams(params || {}).toString();
-      return apiService.apiCall(`/holidays${queryString ? `?${queryString}` : ""}`);
-    },
+    getAll: (params) => apiService.apiCall("/holidays"),
     getById: (id) => apiService.apiCall(`/holidays/${id}`),
     create: (data) =>
       apiService.apiCall("/holidays", {
@@ -433,6 +533,7 @@ export const apiService = {
         method: "DELETE",
       }),
   },
+
   // Popups API
   popups: {
     get: () => apiService.apiCall("/popups"),
@@ -441,10 +542,6 @@ export const apiService = {
         method: "PATCH",
         body: JSON.stringify(data),
       }),
-    uploadPhoto: (file) =>
-      apiService.apiCall("/popups/photo", {
-        method: "PATCH",
-        body: buildPhotoFormData(file, "photo"),
-      }),
+    uploadPhoto: (file) => Promise.resolve({ success: true }),
   },
 };
